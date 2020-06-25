@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using SoccerRanking.Core;
 
 namespace SoccerRanking
 {
@@ -22,14 +23,17 @@ namespace SoccerRanking
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var useDb = bool.Parse(this.Configuration["Settings:UseDb"]);
             var connectionString = this.Configuration["Settings:ConnectionString"];
             services
                 .AddMediatR(typeof(Startup))
                 .AddDatabase(connectionString)
-                .AddServices();
+                .AddServices(useDb);
 
-            var factory = services.BuildServiceProvider().GetService<ISqlFactory>();
-            var isComplete = this.InitSqlStructure(factory).Result;
+            var provider = services.BuildServiceProvider();
+            var factory = provider.GetService<ISqlFactory>();
+            var dataSource = provider.GetService<IDataSourceProvider>();
+            var isComplete = this.InitSqlStructure(factory, dataSource).Result;
             if (!isComplete)
             {
                 var message = "Error creating initial sql sctructure. " +
@@ -76,11 +80,10 @@ namespace SoccerRanking
             });
         }
 
-        private async Task<bool> InitSqlStructure(ISqlFactory factory)
+        private async Task<bool> InitSqlStructure(ISqlFactory factory, IDataSourceProvider dataSourceProvider)
         {
             var executor = new InitialSqlScriptsExecutor(factory);
-            // if available db - change to skip: false
-            return await executor.ExecuteScripts(skip: true);
+            return await executor.ExecuteScripts(useDb: dataSourceProvider.UseDb);
         }
     }
 }

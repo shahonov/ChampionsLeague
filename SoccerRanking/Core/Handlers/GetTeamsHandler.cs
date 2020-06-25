@@ -22,12 +22,12 @@ namespace SoccerRanking.Core.Handlers
 
         public Task<IEnumerable<Team>> Handle(GetTeamsRequest request, CancellationToken cancellationToken)
         {
-            if (request.UseMock)
+            if (request.UseDb)
             {
-                return Task.FromResult(this._mock.GetTeams());
+                return this._db.GetAllTeams();
             }
 
-            return this._db.GetAllTeams();
+            return Task.FromResult(this._mock.GetTeams());
         }
     }
 }

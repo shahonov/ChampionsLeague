@@ -13,9 +13,9 @@ namespace SoccerRanking.Core.DbLayer
             this._sql = factory;
         }
 
-        public async Task<bool> ExecuteScripts(bool skip)
+        public async Task<bool> ExecuteScripts(bool useDb)
         {
-            if (skip)
+            if (!useDb)
             {
                 return true;
             }

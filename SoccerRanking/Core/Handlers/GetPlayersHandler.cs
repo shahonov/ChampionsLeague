@@ -23,14 +23,14 @@ namespace SoccerRanking.Core.Handlers
 
         public Task<IEnumerable<Player>> Handle(GetPlayersRequest request, CancellationToken cancellationToken)
         {
-            if (request.UseMock)
+            if (request.UseDb)
             {
-                var allPlayers = this._mock.GetPlayers();
-                var filtered = allPlayers.Where(x => x.TeamID == request.TeamID);
-                return Task.FromResult(filtered);
+                return this._db.GetAllPlayers(request.TeamID);
             }
 
-            return this._db.GetAllPlayers(request.TeamID);
+            var allPlayers = this._mock.GetPlayers();
+            var filtered = allPlayers.Where(x => x.TeamID == request.TeamID);
+            return Task.FromResult(filtered);
         }
     }
 }

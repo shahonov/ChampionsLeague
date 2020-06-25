@@ -5,14 +5,14 @@ namespace SoccerRanking.Core.Models.Requests
 {
     public class GetPlayersRequest : IRequest<IEnumerable<Player>>
     {
-        public GetPlayersRequest(int teamID, bool useMock)
+        public GetPlayersRequest(int teamID, bool useDb)
         {
             this.TeamID = teamID;
-            this.UseMock = useMock;
+            this.UseDb = useDb;
         }
 
         public int TeamID { get; set; }
 
-        public bool UseMock { get; set; }
+        public bool UseDb { get; set; }
     }
 }
